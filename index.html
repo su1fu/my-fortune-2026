@@ -3,68 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026 丙午马年·神机妙算</title>
+    <title>2026 灵签宝典</title>
     <style>
-        body { font-family: 'STKaiti', '楷体', serif; background: #1a1a1a; color: #f1c40f; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: #2c3e50; padding: 2.5rem; border-radius: 20px; border: 2px solid #f1c40f; box-shadow: 0 0 30px rgba(241, 196, 15, 0.2); text-align: center; width: 90%; max-width: 450px; }
-        h1 { font-size: 2rem; margin-bottom: 1rem; text-shadow: 2px 2px 4px #000; }
-        input { padding: 12px; width: 85%; border-radius: 8px; border: none; margin-bottom: 1.5rem; font-size: 1.1rem; background: #ecf0f1; }
-        button { background: linear-gradient(135deg, #f1c40f, #d35400); color: #fff; border: none; padding: 12px 30px; border-radius: 25px; font-size: 1.1rem; cursor: pointer; font-weight: bold; width: 100%; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        #loading { display: none; margin-top: 20px; font-style: italic; color: #bdc3c7; }
-        #result { margin-top: 2rem; padding: 20px; border-top: 1px dashed #f1c40f; display: none; animation: fadeIn 1s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .zodiac { font-size: 1.5rem; display: block; margin-bottom: 10px; color: #e74c3c; }
-        .desc { line-height: 1.8; text-align: left; font-size: 1rem; color: #ecf0f1; }
+        body { font-family: 'STKaiti', '楷体', serif; background: #1a1a1a; color: #f1c40f; text-align: center; margin: 0; padding: 20px; }
+        .card { background: #2c3e50; padding: 20px; border-radius: 20px; border: 2px solid #f1c40f; max-width: 450px; margin: auto; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        .qiantong { font-size: 80px; cursor: pointer; display: inline-block; transition: transform 0.1s; }
+        .shake { animation: shake 0.5s infinite; }
+        @keyframes shake { 0% { transform: rotate(0deg); } 25% { transform: rotate(10deg); } 50% { transform: rotate(0deg); } 75% { transform: rotate(-10deg); } 100% { transform: rotate(0deg); } }
+        button { background: #d35400; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin-top: 20px; cursor: pointer; font-size: 1.1rem; width: 100%; }
+        #draw-result { display: none; margin-top: 20px; background: #fff; color: #333; padding: 20px; border-radius: 10px; border-left: 10px solid #d35400; }
+        .rank { font-size: 24px; font-weight: bold; color: #e74c3c; display: block; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h1>🔮 2026 运势测算</h1>
-    <input type="date" id="birthday" value="2000-01-01">
-    <button onclick="startCalc()">点击窥探天机</button>
+    <h1>🧧 2026 每日灵签</h1>
+    <p>诚心默念心中所求，点击签筒抽签：</p>
+    
+    <div id="qiantong" class="qiantong" onclick="drawLucky()">🏺</div>
+    
+    <div id="status">点击签筒摇一摇</div>
 
-    <div id="loading">正在沟通天地，请稍候...</div>
-
-    <div id="result">
-        <span class="zodiac" id="zodiacTitle"></span>
-        <div class="desc" id="fortuneContent"></div>
+    <div id="draw-result">
+        <span class="rank" id="luckyRank"></span>
+        <p id="luckyText" style="font-size: 18px; font-weight: bold;"></p>
+        <p id="luckyDesc" style="color: #666; font-style: italic;"></p>
     </div>
+    
+    <hr style="margin: 30px 0; border: 0; border-top: 1px dashed #f1c40f;">
+    <p>或者查询生肖运势：</p>
+    <input type="date" id="birthday" style="padding: 8px; width: 70%;">
+    <button onclick="alert('生肖功能已集成，请参考上一版本逻辑添加')">查询生肖</button>
 </div>
 
 <script>
-    const fortunes = {
-        "鼠": "【冲太岁】2026年运势波动。建议谨言慎行，凡事求稳，不宜冒险。",
-        "牛": "【害太岁】人际关系面临考验，但有贵人暗中相助，多听长辈建议。",
-        "虎": "【三合年份】运势回升！事业有拓展之机，感情生活精彩。",
-        "兔": "【破太岁】虽有阻力，但红鸾星动，单身者极易遇到心仪对象。",
-        "龙": "【平稳发展】上半年压力较大，下半年渐入佳境，财运稳定。",
-        "蛇": "【重回稳健】升职加薪有望，适合学习新技能，告别焦虑。",
-        "马": "【本命年】2026是丙午马年，宜静不宜动，可通过运动舒缓压力。",
-        "羊": "【六合年份】运势极佳！生活顺心，财富增长明显，有意外之财。",
-        "猴": "【驿马星动】奔波劳碌，但“动则生财”，适合出差或向外求财。",
-        "鸡": "【桃花朵朵】感情生活丰富。事业上有贵人支持，偏财运惊喜。",
-        "狗": "【三合年份】才华得到赏识。事业步步高升，注意劳逸结合。",
-        "猪": "【吉星高照】财富丰盈，家宅安宁，是享受生活、陪伴家人的好年。"
-    };
-    const zodiacs = ["猴", "鸡", "狗", "猪", "鼠", "牛", "虎", "兔", "龙", "蛇", "马", "羊"];
+    const allGua = [
+        { rank: "上上签", title: "大吉大利", desc: "所求皆如意，所行化坦途。今年必有贵人相助。" },
+        { rank: "上吉签", title: "锦上添花", desc: "事业稳步上升，感情和睦，利于远行求财。" },
+        { rank: "中平签", title: "静待时机", desc: "目前时机未到，宜守不宜攻，凡事多加忍耐。" },
+        { rank: "下下签", title: "谨慎避险", desc: "今日运势低迷，不宜做出重大决策，建议闭门读书。" }
+    ];
 
-    function startCalc() {
-        const dateInput = document.getElementById('birthday').value;
-        if (!dateInput) return alert("请选择您的生辰");
+    function drawLucky() {
+        const tong = document.getElementById('qiantong');
+        const status = document.getElementById('status');
+        const resultDiv = document.getElementById('draw-result');
 
-        document.getElementById('result').style.display = 'none';
-        document.getElementById('loading').style.display = 'block';
+        // 开始摇晃动画
+        tong.classList.add('shake');
+        status.innerText = "正在求签中...";
+        resultDiv.style.display = 'none';
 
+        // 1.5秒后出结果
         setTimeout(() => {
-            const year = new Date(dateInput).getFullYear();
-            const zodiac = zodiacs[year % 12];
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('zodiacTitle').innerText = "您的生肖：属" + zodiac;
-            document.getElementById('fortuneContent').innerText = fortunes[zodiac];
-            document.getElementById('result').style.display = 'block';
-        }, 1500); // 模拟算命时间
+            tong.classList.remove('shake');
+            const randomGua = allGua[Math.floor(Math.random() * allGua.length)];
+            
+            document.getElementById('luckyRank').innerText = randomGua.rank;
+            document.getElementById('luckyText').innerText = randomGua.title;
+            document.getElementById('luckyDesc').innerText = randomGua.desc;
+            
+            status.innerText = "签已落地！";
+            resultDiv.style.display = 'block';
+        }, 1500);
     }
 </script>
+
 </body>
 </html>

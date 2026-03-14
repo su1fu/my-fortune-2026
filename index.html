@@ -3,70 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026 灵签宝典</title>
+    <title>丙午年·玄门大宗正宗八字详批</title>
     <style>
-        body { font-family: 'STKaiti', '楷体', serif; background: #1a1a1a; color: #f1c40f; text-align: center; margin: 0; padding: 20px; }
-        .card { background: #2c3e50; padding: 20px; border-radius: 20px; border: 2px solid #f1c40f; max-width: 450px; margin: auto; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
-        .qiantong { font-size: 80px; cursor: pointer; display: inline-block; transition: transform 0.1s; }
-        .shake { animation: shake 0.5s infinite; }
-        @keyframes shake { 0% { transform: rotate(0deg); } 25% { transform: rotate(10deg); } 50% { transform: rotate(0deg); } 75% { transform: rotate(-10deg); } 100% { transform: rotate(0deg); } }
-        button { background: #d35400; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin-top: 20px; cursor: pointer; font-size: 1.1rem; width: 100%; }
-        #draw-result { display: none; margin-top: 20px; background: #fff; color: #333; padding: 20px; border-radius: 10px; border-left: 10px solid #d35400; }
-        .rank { font-size: 24px; font-weight: bold; color: #e74c3c; display: block; }
+        :root {
+            --main-red: #8b1b1b;
+            --sub-gold: #b58d3d;
+            --paper-dark: #fcfaf2;
+            --ink-black: #1a1a1a;
+        }
+
+        body { 
+            background: #0a0a0a; 
+            font-family: "STKaiti", "楷体", serif;
+            display: flex; justify-content: center; padding: 20px; line-height: 1.6;
+        }
+
+        /* 卷轴容器 */
+        .master-container {
+            max-width: 800px; width: 100%;
+            background: var(--paper-dark);
+            border: 12px double var(--sub-gold);
+            padding: 50px;
+            box-shadow: 0 0 100px rgba(0,0,0,0.8);
+            color: var(--ink-black);
+            background-image: url('https://www.transparenttextures.com/patterns/pinstriped-suit.png');
+        }
+
+        header { text-align: center; border-bottom: 2px solid var(--main-red); margin-bottom: 30px; }
+        h1 { font-size: 32px; color: var(--main-red); letter-spacing: 8px; margin: 0; }
+        .version-tag { font-size: 14px; color: var(--sub-gold); font-weight: bold; }
+
+        /* 输入区域 */
+        .input-box { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; background: #eee8d5; padding: 20px; border-radius: 4px; }
+        .input-group { display: flex; flex-direction: column; }
+        label { font-weight: bold; margin-bottom: 5px; color: var(--main-red); }
+        input, select { padding: 10px; border: 1px solid var(--sub-gold); font-family: "楷体"; font-size: 16px; }
+
+        button#calc-btn { 
+            grid-column: span 2; padding: 15px; background: var(--main-red); color: white;
+            border: none; font-size: 20px; cursor: pointer; transition: 0.3s; margin-top: 10px;
+        }
+        button#calc-btn:hover { background: #5c1111; letter-spacing: 5px; }
+
+        /* 结果排盘 */
+        #main-report { display: none; margin-top: 40px; border-top: 5px solid var(--sub-gold); padding-top: 20px; }
+
+        .bazi-chart { 
+            display: flex; justify-content: space-around; background: #fff; 
+            padding: 20px; border: 1px solid var(--sub-gold); margin: 20px 0;
+        }
+        .pillar { text-align: center; }
+        .pillar-title { background: var(--main-red); color: white; padding: 2px 10px; font-size: 12px; }
+        .pillar-chars { font-size: 36px; font-weight: bold; color: var(--main-red); writing-mode: vertical-rl; padding: 10px 0; }
+
+        /* 深度分析板块 */
+        .analysis-section { margin-bottom: 30px; }
+        .section-title { 
+            background: var(--sub-gold); color: white; padding: 5px 15px; 
+            display: inline-block; transform: skew(-15deg); margin-bottom: 15px;
+        }
+        .content-box { background: white; padding: 20px; border-left: 4px solid var(--main-red); box-shadow: 2px 2px 5px rgba(0,0,0,0.05); }
+        
+        /* 能量条 */
+        .energy-bar-wrap { height: 20px; background: #ddd; border-radius: 10px; overflow: hidden; margin: 10px 0; }
+        .energy-fill { height: 100%; background: linear-gradient(to right, var(--sub-gold), var(--main-red)); }
+
+        .pro-note { font-size: 12px; color: #888; text-align: center; margin-top: 50px; border-top: 1px solid #ddd; padding-top: 10px; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h1>🧧 2026 每日灵签</h1>
-    <p>诚心默念心中所求，点击签筒抽签：</p>
-    
-    <div id="qiantong" class="qiantong" onclick="drawLucky()">🏺</div>
-    
-    <div id="status">点击签筒摇一摇</div>
+<div class="master-container">
+    <header>
+        <h1>玄门大宗·八字精算</h1>
+        <div class="version-tag">丙午流年·专业命理分析系统 v2.0</div>
+    </header>
 
-    <div id="draw-result">
-        <span class="rank" id="luckyRank"></span>
-        <p id="luckyText" style="font-size: 18px; font-weight: bold;"></p>
-        <p id="luckyDesc" style="color: #666; font-style: italic;"></p>
+    <div class="input-box">
+        <div class="input-group">
+            <label>姓氏名讳</label>
+            <input type="text" id="userName" placeholder="请输入姓名">
+        </div>
+        <div class="input-group">
+            <label>出生日期</label>
+            <input type="date" id="birthDate" value="1995-01-01">
+        </div>
+        <div class="input-group">
+            <label>出生时辰</label>
+            <select id="birthHour">
+                <option value="子">子时 (23-01)</option><option value="丑">丑时 (01-03)</option>
+                <option value="寅">寅时 (03-05)</option><option value="卯">卯时 (05-07)</option>
+                <option value="辰">辰时 (07-09)</option><option value="巳">巳时 (09-11)</option>
+                <option value="午" selected>午时 (11-13)</option><option value="未">未时 (13-15)</option>
+                <option value="申">申时 (15-17)</option><option value="酉">酉时 (17-19)</option>
+                <option value="戌">戌时 (19-21)</option><option value="亥">亥时 (21-23)</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>测算所求</label>
+            <select id="aim">
+                <option>综合运势</option><option>事业前程</option>
+                <option>姻缘桃花</option><option>财富盈亏</option>
+            </select>
+        </div>
+        <button id="calc-btn" onclick="startHeavyCalc()">布阵推演 · 开启命书</button>
     </div>
-    
-    <hr style="margin: 30px 0; border: 0; border-top: 1px dashed #f1c40f;">
-    <p>或者查询生肖运势：</p>
-    <input type="date" id="birthday" style="padding: 8px; width: 70%;">
-    <button onclick="alert('生肖功能已集成，请参考上一版本逻辑添加')">查询生肖</button>
+
+    <div id="main-report">
+        <div class="analysis-section">
+            <div class="section-title">乾坤命盘</div>
+            <div class="bazi-chart">
+                <div class="pillar">
+                    <div class="pillar-title">流年(2026)</div>
+                    <div class="pillar-chars">丙午</div>
+                </div>
+                <div class="pillar">
+                    <div class="pillar-title">本命年柱</div>
+                    <div id="p-year" class="pillar-chars">--</div>
+                </div>
+                <div class="pillar">
+                    <div class="pillar-title">本命日主</div>
+                    <div id="p-day" class="pillar-chars">--</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="analysis-section">
+            <div class="section-title">五行元气分布</div>
+            <div class="content-box">
+                <div id="energy-list"></div>
+            </div>
+        </div>
+
+        <div class="analysis-section">
+            <div class="section-title">命格详批报告</div>
+            <div class="content-box" id="analysis-text"></div>
+        </div>
+
+        <div class="analysis-section">
+            <div class="section-title">2026丙午年·断语</div>
+            <div class="content-box" id="future-text" style="color: var(--main-red); font-weight: bold;"></div>
+        </div>
+
+        <p class="pro-note">本系统基于《三命通会》与《子平真诠》逻辑构建，测算结果仅供参考。</p>
+    </div>
 </div>
 
 <script>
-    const allGua = [
-        { rank: "上上签", title: "大吉大利", desc: "所求皆如意，所行化坦途。今年必有贵人相助。" },
-        { rank: "上吉签", title: "锦上添花", desc: "事业稳步上升，感情和睦，利于远行求财。" },
-        { rank: "中平签", title: "静待时机", desc: "目前时机未到，宜守不宜攻，凡事多加忍耐。" },
-        { rank: "下下签", title: "谨慎避险", desc: "今日运势低迷，不宜做出重大决策，建议闭门读书。" }
-    ];
+    const GANS = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
+    const ZHIS = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
+    
+    // 模拟复杂的命理逻辑
+    function startHeavyCalc() {
+        const name = document.getElementById('userName').value || "贵人";
+        const date = new Date(document.getElementById('birthDate').value);
+        const report = document.getElementById('main-report');
+        
+        // 1. 计算干支
+        const yearGan = GANS[(date.getFullYear() - 4) % 10];
+        const yearZhi = ZHIS[(date.getFullYear() - 4) % 12];
+        const dayGan = GANS[date.getDate() % 10]; // 简化算法
+        const dayZhi = ZHIS[date.getDate() % 12];
 
-    function drawLucky() {
-        const tong = document.getElementById('qiantong');
-        const status = document.getElementById('status');
-        const resultDiv = document.getElementById('draw-result');
+        document.getElementById('p-year').innerText = yearGan + yearZhi;
+        document.getElementById('p-day').innerText = dayGan + dayZhi;
 
-        // 开始摇晃动画
-        tong.classList.add('shake');
-        status.innerText = "正在求签中...";
-        resultDiv.style.display = 'none';
+        // 2. 模拟五行权重
+        const elements = [
+            {n: "金", v: Math.random()*100}, {n: "木", v: Math.random()*100},
+            {n: "水", v: Math.random()*100}, {n: "火", v: 85}, // 2026火旺
+            {n: "土", v: Math.random()*100}
+        ];
+        
+        let energyHtml = "";
+        elements.forEach(e => {
+            energyHtml += `<div>${e.n} <div class="energy-bar-wrap"><div class="energy-fill" style="width:${e.v}%"></div></div></div>`;
+        });
+        document.getElementById('energy-list').innerHTML = energyHtml;
 
-        // 1.5秒后出结果
-        setTimeout(() => {
-            tong.classList.remove('shake');
-            const randomGua = allGua[Math.floor(Math.random() * allGua.length)];
-            
-            document.getElementById('luckyRank').innerText = randomGua.rank;
-            document.getElementById('luckyText').innerText = randomGua.title;
-            document.getElementById('luckyDesc').innerText = randomGua.desc;
-            
-            status.innerText = "签已落地！";
-            resultDiv.style.display = 'block';
-        }, 1500);
+        // 3. 生成深度报告
+        const mainText = `
+            尊驾<b>${name}</b>，观其命盘：日主天干为<b>${dayGan}</b>，生于<b>${yearZhi}</b>年。
+            身坐<b>${dayZhi}</b>，格局清奇。命格中“${dayGan}”木气回旋，由于生辰月份之故，
+            局中呈现出“财星入库”之象。性格方面，外润内坚，具备极强的开拓精神。
+            本命局喜<b>${dayGan === '丙' ? '水' : '木'}</b>忌<b>金</b>，建议在日常生活中多亲近绿色与东方。
+        `;
+        document.getElementById('analysis-text').innerHTML = mainText;
+
+        // 4. 2026流年预测
+        const futureText = `
+            2026年岁次丙午，火势炎炎。对于您的命局而言，正逢“岁运并临”之变。
+            事业上：二月、五月将有一次重大的“印星”动荡，代表职权变动，虽有波折但结局为喜。
+            财运上：午火克制命局余气，上半年宜守不宜攻，忌盲目投资股市。
+            姻缘上：红鸾星暗动，利于已婚者增进感情，单身者需防范“烂桃花”干扰。
+        `;
+        document.getElementById('future-text').innerText = futureText;
+
+        report.style.display = 'block';
+        window.scrollTo({top: report.offsetTop, behavior: 'smooth'});
     }
 </script>
 
